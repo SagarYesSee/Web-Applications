@@ -223,10 +223,13 @@
         clearInterval(countdown);
     });
 
-    restartbtn.addEventListener('click',() =>{
-        hoursSpan.textContent = parseInt(hoursInput.value);
-        minutesSpan.textContent = parseInt(minutesInput.value);
-        secondsSpan.textContent = parseInt(secondsInput.value);
+    restartBtn.addEventListener('click',() =>{
+        clearInterval(countdown);
+        const hours = parseInt(hoursInput.value);
+        const minutes = parseInt(minutesInput.value);
+        const seconds = parseInt(secondsInput.value);
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        startTimer(totalSeconds);
     });
 
     resetBtn.addEventListener('click', () => {
