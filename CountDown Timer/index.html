@@ -1,1 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Countdown Timer</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family:'digital-clock-font',serif;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 17%, #FFCC70 39%, #95da50 60%, #ea3b3b 80%, #d647e8 100%);
+    }
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+    }
+    .timer {
+        font-size: 3em;
+        margin: 20px 0;
+    }
+    button {
+        display: inline-block;
+        margin: 2px;
+        padding: 15px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        outline: none;
+        border: none;
+        border-radius: 5px;
+        box-shadow: 1px 4px 10px 2px grey;
+    }
+    .popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .popup-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    .popup-content label {
+        font-size: 1.2em;
+        margin: 10px;
+    }
 
+    .cancel-button {
+        background-color: #ff6666;
+        color: #fff;
+    }
+
+    .cancel-button:hover {
+        background-color: #ff3333;
+    }
+
+    .pause-button {
+        background-color: #66ccff;
+        color: #fff;
+    }
+
+    .pause-button:hover {
+        background-color: #3399ff;
+    }
+    .setbtn{
+        background-color: #cf9ef1;
+        color: #fff;
+    }
+
+    .setbtn:hover {
+        background-color: #bc5aff;
+    }
+    .setbtn:hover .symbol::after {
+        content: '⏳';
+    }
+
+    .symbol::after {
+        content: '';
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin-left: 5px;
+    }
+
+    .reset:hover .symbol::after {
+        content: '↺';
+    }
+
+    .stop:hover .symbol::after {
+        content: '⏹';
+    }
+
+    .restart:hover .symbol::after {
+        content: ' ▶';
+    }
+
+    .popup-content input {
+        font-size: 1.2em;
+        padding: 5px;
+        margin: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #c3ccce;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+    .popup-content button {
+        font-size: 1.2em;
+        padding: 10px 20px;
+        margin: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #000000;
+        color: #ffffff;
+        cursor: pointer;
+    }
+    .popup-content button:hover {
+        background-color: #54ea5a;
+        color: black;
+    }
+    .clock {
+        margin:17%;
+        border-radius: 17px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+    }
+</style>
+<body>
+<div class ="clock">
+<div class="container">
+    <h1>Countdown Timer</h1>
+    <div class="timer">
+        <span id="hours">00</span> :
+        <span id="minutes">00</span> :
+        <span id="seconds">00</span>
+    </div>
+    <button class="setbtn" id="set-btn">Set Timer<span class="symbol"></span></button>
+    <button class="button pause-button stop" id="stop-btn">Stop Timer<span class="symbol"></span></button>
+    <button class="button pause-button restart" id="restart-btn">Restart Timer<span class="symbol"></span></button>
+    <button class="button cancel-button reset" id="reset-btn">Reset Timer<span class="symbol"></span></button>
+</div>
+</div>
+<div class="popup">
+    <div class="popup-content">
+        <h2>Set Timer</h2>
+        <label for="hours-input">Hours:</label>
+        <input type="number" id="hours-input" min="0" max="23">
+        <label for="minutes-input">Minutes:</label>
+        <input type="number" id="minutes-input" min="0" max="59">
+        <label for="seconds-input">Seconds:</label>
+        <input type="number" id="seconds-input" min="0" max="59">
+        <button id="start-btn">Start Timer</button>
+        <button id="close-btn">Close</button>
+    </div>
+</div>
+
+<script>
+    const restartbtn = document.getElementById('restart-btn');
+    const setBtn = document.getElementById('set-btn');
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const closeBtn = document.getElementById('close-btn');
+    const popup = document.querySelector('.popup');
+    const hoursInput = document.getElementById('hours-input');
+    const minutesInput = document.getElementById('minutes-input');
+    const secondsInput = document.getElementById('seconds-input');
+    const hoursSpan = document.getElementById('hours');
+    const minutesSpan = document.getElementById('minutes');
+    const secondsSpan = document.getElementById('seconds');
+
+    let countdown;
+
+    setBtn.addEventListener('click', () => {
+        popup.style.display = 'block';
+    });
+
+    startBtn.addEventListener('click', () => {
+        const hours = parseInt(hoursInput.value);
+        const minutes = parseInt(minutesInput.value);
+        const seconds = parseInt(secondsInput.value);
+
+        if (isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+            alert('Please enter valid numbers for hours, minutes, and seconds.');
+            return;
+        }
+
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+        if (totalSeconds <= 0) {
+            alert('Please enter a positive number of hours, minutes, and seconds.');
+            return;
+        }
+
+        startTimer(totalSeconds);
+        popup.style.display = 'none';
+    });
+
+    stopBtn.addEventListener('click', () => {
+        clearInterval(countdown);
+    });
+
+    restartbtn.addEventListener('click',() =>{
+        hoursSpan.textContent = parseInt(hoursInput.value);
+        minutesSpan.textContent = parseInt(minutesInput.value);
+        secondsSpan.textContent = parseInt(secondsInput.value);
+    });
+
+    resetBtn.addEventListener('click', () => {
+        clearInterval(countdown);
+        hoursSpan.textContent = '00';
+        minutesSpan.textContent = '00';
+        secondsSpan.textContent = '00';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        popup.style.display = 'none';
+    });
+
+    function startTimer(totalSeconds) {
+        countdown = setInterval(() => {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            hoursSpan.textContent = hours < 10 ? '0' + hours : hours;
+            minutesSpan.textContent = minutes < 10 ? '0' + minutes : minutes;
+            secondsSpan.textContent = seconds < 10 ? '0' + seconds : seconds;
+
+            totalSeconds--;
+
+            if (totalSeconds < 0) {
+                clearInterval(countdown);
+                alert('Time is up!');
+            }
+        }, 1000);
+    }
+</script>
+</body>
+</html>
